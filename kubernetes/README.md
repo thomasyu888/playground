@@ -55,6 +55,12 @@ After setting up the kubernetes cluster on AWS EKS, follow these instructions to
     ```
     kubectl get svc
     ```
+1. Create [docker registry pull secrets](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#add-imagepullsecrets-to-a-service-account)
+    ```
+    kubectl create secret docker-registry myregistrykey --docker-server=DUMMY_SERVER \
+        --docker-username=DUMMY_USERNAME --docker-password=DUMMY_DOCKER_PASSWORD \
+        --docker-email=DUMMY_DOCKER_EMAIL
+    ```
 
 ## Using Kubernetes
 
