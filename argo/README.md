@@ -1,4 +1,4 @@
-# Kubernetes Exploration
+# Argo Exploration
 
 ## Accessing Kubernetes
 
