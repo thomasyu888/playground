@@ -8,3 +8,4 @@ Consists of technologies I have been exploring.  TBE = To be explored.
 - dask (python package)- TBE
 - prefect (python package) - TBE
 - funnel (TES) - TBE
+- Spark - TBE

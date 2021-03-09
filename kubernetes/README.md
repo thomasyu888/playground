@@ -62,18 +62,12 @@ After setting up the kubernetes cluster on AWS EKS, follow these instructions to
         --docker-email=DUMMY_DOCKER_EMAIL
     ```
 
-## Using Kubernetes
-
 ### Deploying a Kubernetes dashboard
 * Deploy dashboard - https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
 * Create service account - https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/creating-sample-user.md
 
 ### Deploying spark with Helm
 https://medium.com/@tomlous/deploying-apache-spark-jobs-on-kubernetes-with-helm-and-spark-operator-eb1455930435
-
-### Deploying your own application
-...
-
 
 
 ### Common Kubernetes functions
