@@ -1,0 +1,51 @@
+#!/usr/bin/env cwl-runner
+#
+# Model to Data Challenge Workflow 
+# Inputs:
+#   submissionId: ID of the Synapse submission to process
+#   adminUploadSynId: ID of a folder accessible only to the submission queue administrator
+#   submitterUploadSynId: ID of a folder accessible to the submitter
+#   workflowSynapseId:  ID of the Synapse entity containing a reference to the workflow file(s)
+#   synapseConfig: ~/.synapseConfig file that has your Synapse credentials
+#
+cwlVersion: v1.0
+class: Workflow
+
+requirements:
+  - class: StepInputExpressionRequirement
+
+inputs:
+  - id: data
+    type: Directory
+  - id: output_filename
+    type: string
+
+steps:
+
+  run_docker:
+    run: {{ run_docker_tool }}
+    in:
+      - id: data
+        source: "#data"
+      - id: output_filename
+        source: "#output_filename"
+    out: [output]
+
+  validate_and_score:
+    run: validate_and_score.cwl
+    in:
+      - id: inputfile
+        source: "#run_docker/output"
+    out: [results]
+
+outputs:
+  output:
+    type: File
+    outputSource: run_docker/output
+
+  scores:
+    type: File
+    outputSource: validate_and_score/results
+
+
+ 

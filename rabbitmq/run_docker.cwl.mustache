@@ -1,0 +1,44 @@
+#!/usr/bin/env cwl-runner
+#
+# Run a docker model
+#
+
+cwlVersion: v1.0
+class: CommandLineTool
+
+hints:
+  DockerRequirement:
+    dockerPull: {{{ docker_repository }}}
+
+requirements:
+  - class: InlineJavascriptRequirement
+
+inputs:
+  - id: data
+    type: Directory
+    inputBinding:
+      prefix: --data
+
+  - id: output_filename
+    type: string
+    inputBinding:
+      prefix: --output
+
+outputs:
+  - id: output
+    type: File
+    outputBinding:
+      glob: $(inputs.output_filename)
+
+{{#training}}
+  - id: model_state
+    type: Directory
+    outputBinding:
+      glob: model
+{{/training}}
+{{#scratch}}
+  - id: scratch
+    type: Directory
+    outputBinding:
+      glob: scratch
+{{/scratch}}
