@@ -6,6 +6,10 @@ After setting up the kubernetes cluster on AWS EKS, follow these instructions to
 
 1.  To access the kubernetes cluster on AWS EKS, one must have access to the aws account. Follow these [instructions](https://sagebionetworks.jira.com/wiki/spaces/IT/pages/405864455/Jumpcloud) under section, 'AWS CLI with Jumpcloud credentials
 '.
+1.  Start conda environment that has `aws-cli` and `kubectl`
+    ```
+    conda activate aws
+    ```
 1.  After you confirm access aws by running:
     ```
     aws --profile sandbox-developer s3api list-buckets
