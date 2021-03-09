@@ -4,7 +4,7 @@
 
 After setting up the kubernetes cluster on AWS EKS, follow these instructions to access the kubernetes cluster.  I created a kubernetes cluster called `tom-test`, which you should be able to see after logging into AWS via jumpcloud.
 
-1.  Follow instructions on aws to set up your `~/.kube/config`
+1.  Follow instructions on aws to set up your `~/.kube/config`.
     ```
     apiVersion: v1
     clusters:
