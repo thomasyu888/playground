@@ -19,20 +19,6 @@ After setting up the kubernetes cluster on AWS EKS, follow these instructions to
     kubectl get svc
     ```
 
-## Using Kubernetes
-
-### Deploying a Kubernetes dashboard
-* Deploy dashboard - https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
-* Create service account - https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/creating-sample-user.md
-
-### Deploying spark with Helm
-https://medium.com/@tomlous/deploying-apache-spark-jobs-on-kubernetes-with-helm-and-spark-operator-eb1455930435
-
-### Deploying your own application
-...
-
-
-
 ### Common Kubernetes functions
 
 ```
@@ -49,3 +35,23 @@ kubectl delete configmap funnel-config
 # Restarting a service
 kubectl rollout restart deployment yourservice
 ```
+
+
+### Argo
+
+Follow instructions [here](https://argoproj.github.io/argo/quick-start/) to create the argo namespace on kubernetes. This was the clusterrolebinding command I ran.
+
+```
+kubectl create clusterrolebinding tom-cluster-admin-binding --clusterrole=cluster-admin --user=thomas.yu@sagebase.com
+```
+
+If the argo namespace already exists (check if it exists by running `kubectl get namespace`, more on [namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
+
+```
+argo submit -n argo --watch https://raw.githubusercontent.com/argoproj/argo/master/examples/hello-world.yaml
+argo list -n argo
+argo get -n argo @latest
+argo logs -n argo @latest
+```
+
+
