@@ -4,6 +4,39 @@
 
 After setting up the kubernetes cluster on AWS EKS, follow these instructions to access the kubernetes cluster.  I created a kubernetes cluster called `tom-test`, which you should be able to see after logging into AWS via jumpcloud.
 
+1.  Follow instructions on aws to set up your `~/.kube/config`
+    ```
+    apiVersion: v1
+    clusters:
+    - cluster:
+        certificate-authority-data: # Fill in value here
+        server:  # Fill in value here
+    name: arn:aws:eks:us-east-1:563295687221:cluster/tom-test
+    contexts:
+    - context:
+        cluster: arn:aws:eks:us-east-1:563295687221:cluster/tom-test
+        user: arn:aws:eks:us-east-1:563295687221:cluster/tom-test
+    name: arn:aws:eks:us-east-1:563295687221:cluster/tom-test
+    current-context: arn:aws:eks:us-east-1:563295687221:cluster/tom-test
+    kind: Config
+    preferences: {}
+    users:
+    - name: arn:aws:eks:us-east-1:563295687221:cluster/tom-test
+    user:
+        exec:
+        apiVersion: client.authentication.k8s.io/v1alpha1
+        args:
+        - --region
+        - us-east-1
+        - eks
+        - get-token
+        - --cluster-name
+        - tom-test
+        command: aws
+        env:
+        - name: AWS_PROFILE
+            value: sandbox-admin
+    ```
 1.  To access the kubernetes cluster on AWS EKS, one must have access to the aws account. Follow these [instructions](https://sagebionetworks.jira.com/wiki/spaces/IT/pages/405864455/Jumpcloud) under section, 'AWS CLI with Jumpcloud credentials
 '.
 1.  Start conda environment that has `aws-cli` and `kubectl`
