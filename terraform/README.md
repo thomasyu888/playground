@@ -22,5 +22,3 @@ Terraform allows you to write infrastructure as code.  This is my exploration of
     cd learn-terraform-aws-instance
     terrafrom apply
     ```
-
-
