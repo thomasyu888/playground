@@ -31,6 +31,13 @@ Terraform allows you to write infrastructure as code.  This is my exploration of
     terraform destroy
     ```
 
+1. Terraform configuration can be split into different files
+
+    - main.tf: Houses the resources to spin up
+    - provider.tf: Determines what provider to use (GCP, AWS...)
+    - backend.tf: Determines what backend to use (local, remote)
+    - variable.tf: Resources can take variables
+    - outputs.tf: Resources can have outputs
 
 ## Terraform cloud
 

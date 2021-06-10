@@ -1,6 +1,6 @@
 resource "aws_instance" "app_server" {
   ami           = "ami-0810a318c4b1243c5"
-  instance_type = "t2.large"
+  instance_type = var.instance_type
   key_name      = "tomnew"
 
   root_block_device {
@@ -11,7 +11,7 @@ resource "aws_instance" "app_server" {
   subnet_id              = "subnet-025c297e427e44daf"
 
   tags = {
-    Name    = "ExampleAppServerInstance"
+    Name    = var.instance_name
     Project = "IBC"
   }
 }
