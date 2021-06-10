@@ -6,7 +6,7 @@ Consists of technologies I have been exploring.  TBE = To be explored.  TBD - To
 - [Kubernetes](https://thomasyu888.github.io/playground/kubernetes/)
 - [RabbitMQ](https://thomasyu888.github.io/playground/rabbitmq/)
 - dask (python package)- TBE
-- prefect (python package) - TBE
+- [prefect (python package)](https://thomasyu888.github.io/playground/prefect/)
 - funnel (TES) - TBD
 - Spark - TBE
 - nextflow - TBD

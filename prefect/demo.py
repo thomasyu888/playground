@@ -1,19 +1,19 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
 import random
 import string
 
 import pandas as pd
 from prefect import task, Flow, Parameter
-from prefect.schedules import IntervalSchedule
+# from prefect.schedules import IntervalSchedule
+
 # from prefect.executors import DaskExecutor
 import synapseclient
 from synapsemonitor import monitor
 
-
 syn = synapseclient.login()
 
 
-def download_file(syn, synid):
+def download_file(synid):
     filepath = syn.get(synid).path
     filedf = pd.read_csv(filepath)
     if filedf.empty:
@@ -45,7 +45,7 @@ def extract_last_modified_data(days):
     print("fetching last modified data")
     modified_entities = monitor.find_modified_entities(syn, "syn24187217",
                                                        days=days)
-    all_text = [download_file(syn, synid)
+    all_text = [download_file(synid)
                 for synid in modified_entities['id']]
 
     return all_text
@@ -73,13 +73,14 @@ def load_transformed_data(transformed_data):
 
 def main():
 
-    schedule = IntervalSchedule(
-        start_date=datetime.utcnow() + timedelta(seconds=1),
-        interval=timedelta(minutes=1),
-    )
+    # schedule = IntervalSchedule(
+    #     start_date=datetime.utcnow() + timedelta(seconds=1),
+    #     interval=timedelta(minutes=1),
+    # )
 
-    with Flow("etl", schedule=schedule) as flow:
-        days = Parameter("days", default=30)
+    # with Flow("etl", schedule=schedule) as flow:
+    with Flow("etl") as flow:
+        days = Parameter("days", default=40)
         last_modified_data = extract_last_modified_data(days)
         all_data = extract_all_data()
 
@@ -88,7 +89,9 @@ def main():
         load_all_data(all_data)
         load_transformed_data(transformed_data)
 
+    # flow.register(project_name="tutorial")
     flow.run()
+#    flow.visualize()
 
 
 if __name__ == "__main__":
