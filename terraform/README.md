@@ -44,4 +44,6 @@ Terraform allows you to write infrastructure as code.  This is my exploration of
 Followed instructions [here](https://learn.hashicorp.com/tutorials/terraform/cloud-sign-up?in=terraform/cloud-get-started) to get started.
 
 - When using terraform cloud, you can't have a local `terraform.tfstate`
-- Not sure how to store amazon credentials on terraform cloud, so you can change the settings to run the applies locally, to only have workspaces save the state.
+- Two options to run terraform:
+    - Change the settings to run the applies locally, to only have workspaces save the state.
+    - Provide [env variables](https://learn.hashicorp.com/tutorials/terraform/aws-remote?in=terraform/aws-get-started#set-workspace-variables) to allow terraform cloud to access AWS account. (Don't like this)
