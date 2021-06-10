@@ -22,3 +22,17 @@ Terraform allows you to write infrastructure as code.  This is my exploration of
     cd learn-terraform-aws-instance
     terrafrom apply
     ```
+
+    Terraform stores the state either locally or remotely.  By default, it is stored locally in a file but the state can actually be stored in terraform cloud or terraform enterprise.
+
+1. Remove instance
+
+    ```
+    terraform destroy
+    ```
+
+
+## Terraform cloud
+
+- When using terraform cloud, you can't have a local `terraform.tfstate`
+- Not sure how to store amazon credentials on terraform cloud, so you can change the settings to run the applies locally, to only have workspaces save the state.
