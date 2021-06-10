@@ -1,6 +1,6 @@
 # Playground
 
-Consists of technologies I have been exploring.  TBE = To be explored.  TBD - To be documented.
+Consists of technologies I have been exploring.  TBE = To be explored.  TBD - To be documented.  Emoji commits to show people what you are working on: https://gitmoji.dev/
 
 - [Argo](https://thomasyu888.github.io/playground/argo/)
 - [Kubernetes](https://thomasyu888.github.io/playground/kubernetes/)
