@@ -1,4 +1,3 @@
-
 resource "aws_instance" "app_server" {
   ami           = "ami-0810a318c4b1243c5"
   instance_type = "t2.large"

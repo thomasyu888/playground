@@ -1,5 +1,7 @@
 terraform {
-
+  # Comment out his backend component to
+  # go with local backend.  This will create a
+  # terraform.state file
   backend "remote" {
     organization = "sage-bionetworks"
 
