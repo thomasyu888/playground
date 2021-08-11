@@ -4,7 +4,7 @@
 
 After setting up the kubernetes cluster on AWS EKS, follow these instructions to access the kubernetes cluster.  I created a kubernetes cluster called `tom-test`, which you should be able to see after logging into AWS via jumpcloud.
 
-1.  Follow instructions on aws to set up your `~/.kube/config`.
+1.  Follow instructions on [aws](https://docs.aws.amazon.com/eks/latest/userguide/create-kubeconfig.html) to set up your `~/.kube/config`.
 
     ```
     apiVersion: v1
@@ -98,4 +98,17 @@ kubectl get pods -l app=servicename
 kubectl delete configmap funnel-config
 # Restarting a service
 kubectl rollout restart deployment yourservice
+```
+
+### Deploy cronjobs
+
+https://v1-19.docs.kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/
+
+```
+kubectl apply -f cronjob.yaml
+kubectl get cronjob
+kubectl get jobs --watch
+# Replace "hello-4111706356" with the job name in your system
+kubectl get pods --selector=job-name=hello-1628671800
+
 ```
