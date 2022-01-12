@@ -6,8 +6,6 @@ from datetime import datetime
 from airflow.decorators import dag, task
 import synapseclient
 
-# [END import_module]
-
 
 # [START instantiate_dag]
 @dag(schedule_interval=None, start_date=datetime(2021, 1, 1), catchup=False, tags=['synapse'])
@@ -86,5 +84,3 @@ def synapse_etl_test():
 # [START dag_invocation]
 synapse_etl_dag = synapse_etl_test()
 # [END dag_invocation]
-
-# [END tutorial]
