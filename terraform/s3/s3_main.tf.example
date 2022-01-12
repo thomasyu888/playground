@@ -13,6 +13,21 @@ locals {
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
+# Upload an object
+resource "aws_s3_bucket_object" "object" {
+
+  bucket = aws_s3_bucket.b1.id
+
+  key    = "profile"
+
+  acl    = "private"  # or can be "public-read"
+
+  source = "myfiles/yourfile.txt"
+
+  etag = filemd5("myfiles/yourfile.txt")
+
+}
+
 resource "aws_s3_bucket" "default_kms_bucket" {
   count         = var.create_bucket == 1 && var.create_kms_key == 0 ? 1 : 0
   request_payer = var.request_payer
