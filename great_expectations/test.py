@@ -1,3 +1,5 @@
+import os
+
 import great_expectations as ge
 from great_expectations.core.expectation_configuration import ExpectationConfiguration
 from great_expectations.data_context import BaseDataContext
@@ -9,12 +11,7 @@ from great_expectations.data_context.types.base import (
 from great_expectations.data_context.types.resource_identifiers import (
     ExpectationSuiteIdentifier,
 )
-from great_expectations.exceptions.exceptions import GreatExpectationsError
-from great_expectations.core.batch import BatchRequest
-from great_expectations.checkpoint.checkpoint import SimpleCheckpoint
-
 import pandas as pd
-import os
 
 # Build context
 context = ge.get_context()
@@ -59,12 +56,11 @@ context = BaseDataContext(project_config=data_context_config)
 # context.test_yaml_config(yaml.dump(datasource_config))
 context.add_datasource(**datasource_config)
 
-# Create expectation suite
+# Create expectation suite (this is your suite of tests)
 expectation_suite_name = "Testing"
 suite = context.create_expectation_suite(
     expectation_suite_name=expectation_suite_name, overwrite_existing=True
 )
-
 # Build expectation suite
 expectation_configuration = ExpectationConfiguration(
     # Name of expectation type being added
@@ -95,7 +91,7 @@ expectation_configuration = ExpectationConfiguration(
 # Add the Expectation to the suite
 suite.add_expectation(expectation_configuration=expectation_configuration)
 
-
+# Extra expectations per column
 expectation_configuration = ExpectationConfiguration(
     expectation_type="expect_column_values_to_be_in_set",
     kwargs={
@@ -106,6 +102,7 @@ expectation_configuration = ExpectationConfiguration(
 )
 suite.add_expectation(expectation_configuration=expectation_configuration)
 
+# Extra expectations
 expectation_configuration = ExpectationConfiguration(
     expectation_type="expect_column_values_to_not_be_null",
     kwargs={
