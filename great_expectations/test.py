@@ -130,7 +130,6 @@ context.build_data_docs(resource_identifiers=[suite_identifier])
 ##Webpage DataDocs opened here:
 context.open_data_docs(resource_identifier=suite_identifier)
 
-
 # Set up and run a Simple Checkpoint for ad hoc validation of our data
 checkpoint_name = "manifest_checkpoint"
 checkpoint_config = {
