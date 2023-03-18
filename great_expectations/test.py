@@ -122,13 +122,7 @@ context.save_expectation_suite(
     expectation_suite=suite, expectation_suite_name=expectation_suite_name
 )
 
-suite_identifier = ExpectationSuiteIdentifier(
-    expectation_suite_name=expectation_suite_name
-)
-
-context.build_data_docs(resource_identifiers=[suite_identifier])
-##Webpage DataDocs opened here:
-context.open_data_docs(resource_identifier=suite_identifier)
+# You've now built all your tests and saved it to a suite.
 
 # Set up and run a Simple Checkpoint for ad hoc validation of our data
 checkpoint_name = "manifest_checkpoint"
@@ -167,6 +161,9 @@ results = context.run_checkpoint(
 
 # Build Data Docs
 context.build_data_docs()
+suite_identifier = ExpectationSuiteIdentifier(
+    expectation_suite_name=expectation_suite_name
+)
 # This shows the results of the execution
 context.open_data_docs(resource_identifier=suite_identifier)
 # This shows the expectations
