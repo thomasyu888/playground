@@ -2,47 +2,45 @@
 import gzip
 import json
 import time
+import os
 
+from dotenv import load_dotenv
 import requests
+
+
+load_dotenv()
 
 PROJECT_ID = "2943651"  # mixpanel.com/project/<YOUR_PROJECT_ID>
 USER = "testing.fe6ab4.mp-service-account"  # Service Account user
-PASS = ""  # Service Account password
+PASS = os.getenv("PASS")  # Service Account password
 
+
+# int(time.time())
 sample_events = [
     {
-        "event": "workflow_run",
+        "event": "release",
         "properties": {
             # These properties are required
-            "time": int(time.time()),
-            "distinct_id": "workflow_user",
+            "time": 1672621200,
+            "distinct_id": "GENIE",
             "$insert_id": "04ce0cf4-a633-4371-b665-9b45317b4976",
             # Any other properties are optional
-            "city": "San Francisco",
-            "status": "FAIL"
-        }
-    }
-]
-
-sample_events = [
-    {
-        "event": "my_test_event",
-        "properties": {
-            # These properties are required
-            "time": int(time.time()),
-            "distinct_id": "test_user",
-            "$insert_id": "04ce0cf4-a633-4371-b665-9b45317b4976",
-            # Any other properties are optional
-            "city": "San Francisco",
+            'name': "release_13",
+            "number_of_samples": 167423,
+            "number_of_variants": 1432225
         },
     },
     {
-        "event": "another_event",
+        "event": "release",
         "properties": {
-            "time": int(time.time()),
-            "distinct_id": "test_user_2",
-            "$insert_id": "3b033b9a-6bc9-4b70-90c3-a53e11f6896e",
-            "city": "Seattle",
+            # These properties are required
+            "time": 1664668800,
+            "distinct_id": "GENIE",
+            "$insert_id": "04ce0cf4-a633-4371-b665-9b45317b4976",
+            # Any other properties are optional
+            'name': "release_13",
+            "number_of_samples": 153554,
+            "number_of_variants": 1261267
         },
     },
 ]
