@@ -9,6 +9,7 @@ process test {
         """
         R -e 2 + 2
         """
+}
 
 workflow {
     test()
