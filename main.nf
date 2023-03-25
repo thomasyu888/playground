@@ -12,5 +12,6 @@ process test {
 }
 
 workflow {
-    test()
+    foo = "bar"
+    test(foo)
 }
