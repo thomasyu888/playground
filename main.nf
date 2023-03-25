@@ -1,3 +1,4 @@
+nextflow.enable.dsl=2
 process test {
 
     container 'r-base:4.0.0'
