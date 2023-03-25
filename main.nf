@@ -1,9 +1,6 @@
 process test {
 
     container 'r-base:4.0.0'
-
-    input:
-        val cohort
     
     script:
         """
@@ -12,6 +9,5 @@ process test {
 }
 
 workflow {
-    foo = "bar"
-    test(foo)
+    test()
 }
