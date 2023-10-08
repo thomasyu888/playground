@@ -13,6 +13,7 @@ Technologies explored.  Emoji commits to show people what you are working on: ht
 - [great_expectations](https://thomasyu888.github.io/playground/great_expectations/)
 - [precommits](https://thomasyu888.github.io/playground/precommits/)
 - [snowflake](https://github.com/Sage-Bionetworks/snowflake)
+- [fastapi](https://thomasyu888.github.io/playground/fastapi/)
 
 ## To Be Expored
 
