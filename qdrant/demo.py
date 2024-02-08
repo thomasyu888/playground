@@ -1,3 +1,7 @@
+"""
+Followed these steps
+https://qdrant.tech/documentation/tutorials/search-beginners/
+"""
 import os
 
 from dotenv import dotenv_values
