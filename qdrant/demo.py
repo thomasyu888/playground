@@ -5,8 +5,7 @@ import snowflake.connector
 from qdrant_client import models, QdrantClient
 from sentence_transformers import SentenceTransformer
 
-import pandas as pd
-
+# 1. log into snowflake
 config = dotenv_values(os.path.expanduser("~/.snowsql/.env"))
 
 ctx = snowflake.connector.connect(
@@ -20,7 +19,8 @@ ctx = snowflake.connector.connect(
 )
 
 cur = ctx.cursor()
-# Extract public data
+
+# 1. Extract public data from snowflake
 cur.execute(
     """
     SELECT
@@ -35,7 +35,7 @@ cur.execute(
     on
         node_latest.created_by = userprofile_latest.id
     where
-        is_public
+        is_public and NODE_TYPE = 'project'
     """
 )
 
@@ -48,11 +48,14 @@ documents = [
         'author': row['USER_NAME'],
         'year': str(row['CREATED_ON'])
     }
-    for index, row in df.iterrows()
+    for _, row in df.iterrows()
 ]
 
+# 2. Create Qdrant vector database in memory
 qdrant = QdrantClient(":memory:")
+# qdrant_client = QdrantClient("http://localhost:6333")
 
+# 3. Leverage model to create embeddings
 encoder = SentenceTransformer("all-MiniLM-L6-v2")
 
 qdrant.recreate_collection(
@@ -62,7 +65,7 @@ qdrant.recreate_collection(
         distance=models.Distance.COSINE,
     ),
 )
-
+# 4. upload embeddings into vector database along with metadata
 qdrant.upload_points(
     collection_name="synapse_public_entities",
     points=[
@@ -72,24 +75,13 @@ qdrant.upload_points(
         for idx, doc in enumerate(documents)
     ],
 )
+# embeddings = encoder.encode(df['NAME'], batch_size=128, show_progress_bar=True)
 
+# 5. perform a search
 hits = qdrant.search(
     collection_name="synapse_public_entities",
     query_vector=encoder.encode("AACR GENIE").tolist(),
-    limit=3,
-)
-for hit in hits:
-    print(hit.payload, "score:", hit.score)
-
-
-
-hits = qdrant.search(
-    collection_name="synapse_public_entities",
-    query_vector=encoder.encode("alien invasion").tolist(),
-    query_filter=models.Filter(
-        must=[models.FieldCondition(key="year", range=models.Range(gte=2000))]
-    ),
-    limit=1,
+    limit=50,
 )
 for hit in hits:
     print(hit.payload, "score:", hit.score)
