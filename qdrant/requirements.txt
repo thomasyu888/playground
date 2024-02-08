@@ -1,0 +1,4 @@
+"snowflake-connector-python[pandas]"
+ -U sentence-transformers
+ qdrant-client
+ python-dotenv
