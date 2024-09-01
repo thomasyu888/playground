@@ -1,6 +1,6 @@
 # Flask exploration
 
-This is to explore hosting of APIs using Flask, but more importantly, it is to explore the use fo Celery for the asynchronous repsonse-reply design pattern for APIs that require long processing jobs.
+This is to explore hosting of APIs using Flask, but more importantly, it is to explore the use fo Celery for the asynchronous response-reply design pattern for APIs that require long processing jobs.
 
 ## Asyncronous response-reply design pattern
 
