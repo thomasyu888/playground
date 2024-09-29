@@ -53,6 +53,7 @@ class ManifestGeneratorUser(HttpUser):
         with self.client.get("/manifest/generate", params=params, headers=self.headers, catch_response=True) as response:
             if response.status_code == 200:
                 response.success()
+                # TODO Add md5 check for manifest
                 print("Manifest (Excel) generated successfully.")
             else:
                 response.failure(f"Failed to generate manifest (Excel). Status code: {response.status_code}")
@@ -69,6 +70,7 @@ class ManifestGeneratorUser(HttpUser):
         with self.client.get("/manifest/generate", params=params, headers=self.headers, catch_response=True) as response:
             if response.status_code == 200:
                 response.success()
+                # TODO Add md5 check for manifest
                 print("HTAN manifest (Google Sheet) generated successfully.")
             else:
                 response.failure(f"Failed to generate HTAN manifest. Status code: {response.status_code}")
@@ -87,6 +89,7 @@ class ManifestGeneratorUser(HttpUser):
         with self.client.get("/manifest/generate", params=params, headers=self.headers, catch_response=True) as response:
             if response.status_code == 200:
                 response.success()
+                # TODO Add md5 check for manifest
                 print("Existing manifest (Google Sheet) generated successfully.")
             else:
                 response.failure(f"Failed to generate existing manifest. Status code: {response.status_code}")
