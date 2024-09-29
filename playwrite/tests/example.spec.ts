@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Login with OAuth', () => {
-  test("login, save cookies and localStorage", async ({ page, context }) => {
+  test.beforeEach("login, save cookies and localStorage", async ({ page, context }) => {
       // Navigate to application login page
       await page.goto('https://dca.app.sagebionetworks.org');
       const username = process.env.SCHEMATIC_USERNAME;
@@ -35,15 +35,18 @@ test.describe('Login with OAuth', () => {
       console.log('Cookies and localStorage should now be saved in state.json file for further cache usage...');
   });
   // Test suite ends
-});
+  test('Test with logged-in user', async ({ page }) => {
 
-// TODO The state needs to be saved here
-test('Test with logged-in user', async ({ page }) => {
+    // Navigate to a page that requires authentication
+    await page.goto('https://dca.app.sagebionetworks.org');
 
-  // Navigate to a page that requires authentication
-  await page.goto('https://dca.app.sagebionetworks.org');
+    // Your test logic here, e.g., checking for a logged-in element
+    await expect(page.locator('text=Data Curator')).toBeVisible();
+    await page.click('button:has-text("Next")');
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('text=Select a Project:')).toBeVisible();
+    await page.screenshot({ path: 'next.png' });
+  });
 
-  // Your test logic here, e.g., checking for a logged-in element
-  await expect(page.locator('text=Data Curator')).toBeVisible();
 });
 
