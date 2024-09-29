@@ -154,15 +154,12 @@ class AssetStorageUser(HttpUser):
 
 class ManifestSubmissionUser(HttpUser):
     wait_time = between(1, 5)  # Users will wait between 1 and 5 seconds between tasks
+    fixed_count = 5
+
     def on_start(self):
         # Optionally authenticate or set up other necessary state here
         self.token = f"Bearer {os.environ['TOKEN']}"
         self.headers = {"Authorization": self.token}
-    # def on_start(self):
-    #     # Token setup, equivalent to `StoreRuntime.get_access_token()`
-    #     self.token = "Bearer example_token"
-    #     self.headers = {"Authorization": self.token}
-    #     self.base_url = f"{BASE_URL}/model/submit"
 
     def execute_manifest_submission(self, data_type_lst, record_type_lst, params, description, file_path_manifest):
         """
@@ -181,9 +178,9 @@ class ManifestSubmissionUser(HttpUser):
                 with self.client.post("/model/submit", headers=self.headers, params=params, files=files, catch_response=True) as response:
                     if response.status_code == 200:
                         response.success()
-                        print(f"Manifest {record_type} submitted successfully.")
+                        print(f"Manifest {record_type} {file_path_manifest} submitted successfully.")
                     else:
-                        response.failure(f"Failed to submit manifest {record_type}. Status code: {response.status_code}")
+                        response.failure(f"Failed to submit manifest {record_type} {file_path_manifest}. Status code: {response.status_code}")
 
         return combined_list
 
@@ -197,7 +194,7 @@ class ManifestSubmissionUser(HttpUser):
             "dataset_id": "syn51376664",
             "asset_view": "syn51376649",
             "restrict_rules": True,
-            "use_schema_label": True,
+            # "use_schema_label": True,
             "data_model_labels": "class_label",
             "table_manipulation": "replace",
         }
@@ -224,7 +221,6 @@ class ManifestSubmissionUser(HttpUser):
             "dataset_id": "syn51376664",
             "asset_view": "syn51376649",
             "restrict_rules": True,
-            # "use_schema_label": True,
             "data_model_labels": "class_label",
             "table_manipulation": "replace",
         }
