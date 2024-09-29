@@ -236,3 +236,61 @@ class ManifestSubmissionUser(HttpUser):
             description,
             file_path_manifest="test_manifests/synapse_storage_manifest_dataflow.csv"
         )
+
+
+class ManifestValidateUser(HttpUser):
+    """
+    Locust User for manifest validation tasks
+    """
+    wait_time = between(1, 3)  # Wait time between tasks
+
+    def on_start(self):
+        # Optionally authenticate or set up other necessary state here
+        self.token = f"Bearer {os.environ['TOKEN']}"
+        self.headers = {"Authorization": self.token}
+
+    def execute_validate_manifest(self, params, file_path_manifest):
+        """
+        Simulate submitting a manifest with different parameters set by users and record latency
+        """
+        files = {
+            'file_name': (os.path.basename(file_path_manifest), open(file_path_manifest, 'rb'), 'text/csv')
+        }
+        # Simulating the submission using a POST request
+        with self.client.post("/model/validate", headers=self.headers, params=params, files=files, catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+                print(f"Manifest {params} {file_path_manifest} submitted successfully.")
+            else:
+                response.failure(f"Failed to submit manifest {params} {file_path_manifest}. Status code: {response.status_code}")
+
+    @task
+    def validate_patient_manifest(self):
+        """
+        Task to validate patient manifest with different restrict rules
+        """
+        params = {
+            "schema_url": EXAMPLE_SCHEMA_URL,
+            "data_type": "Patient",
+        }
+        # Validate with restrict rules True and False
+        for restrict_rule in [True, False]:
+            params['restrict_rules'] = restrict_rule
+            self.execute_validate_manifest(
+                params=params,
+                file_path_manifest="test_manifests/synapse_storage_manifest_patient.csv",
+            )
+    @task
+    def validate_biospecimen_manifest(self):
+        """
+        Task to validate HTAN manifest with Biospecimen data type
+        """
+        params = {
+            "schema_url": EXAMPLE_SCHEMA_URL,
+            "data_type": "Biospecimen",
+            "restrict_rules": False
+        }
+        self.execute_validate_manifest(
+            params=params,
+            file_path_manifest="test_manifests/synapse_storage_manifest_HTAN_HMS.csv",
+        )
