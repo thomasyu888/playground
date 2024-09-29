@@ -169,9 +169,8 @@ class ManifestSubmissionUser(HttpUser):
         Simulate submitting a manifest with different parameters set by users and record latency
         """
         combined_list = []
-        # data = {"file_name": file_path_manifest}
         files = {
-            'file_name': ('synapse_storage_manifest_patient.csv', open(file_path_manifest, 'rb'), 'text/csv')
+            'file_name': (os.path.basename(file_path_manifest), open(file_path_manifest, 'rb'), 'text/csv')
         }
         for opt in data_type_lst:
             for record_type in record_type_lst:
