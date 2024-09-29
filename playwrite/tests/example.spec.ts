@@ -37,19 +37,13 @@ test.describe('Login with OAuth', () => {
   // Test suite ends
 });
 
-// test('has title', async ({ page }) => {
-//   await page.goto('https://dca.app.sagebionetworks.org/');
+// TODO The state needs to be saved here
+test('Test with logged-in user', async ({ page }) => {
 
-//   // Expect a title "to contain" a substring.
-//   await expect(page).toHaveTitle(/Data Curator/);
-// });
+  // Navigate to a page that requires authentication
+  await page.goto('https://dca.app.sagebionetworks.org');
 
-// test('get started link', async ({ page }) => {
-//   await page.goto('https://dca.app.sagebionetworks.org/');
+  // Your test logic here, e.g., checking for a logged-in element
+  await expect(page.locator('text=Data Curator')).toBeVisible();
+});
 
-//   // Click the get started link.
-//   await page.getByRole('link', { name: 'Get started' }).click();
-
-//   // Expects page to have a heading with the name of Installation.
-//   await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
-// });
