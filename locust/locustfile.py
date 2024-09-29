@@ -186,31 +186,6 @@ class ManifestSubmissionUser(HttpUser):
                     else:
                         response.failure(f"Failed to submit manifest {record_type}. Status code: {response.status_code}")
 
-                #     # Add additional custom logic for calculating latency, num_rows, etc. if needed
-                #     if "example" in description:
-                #         data_schema = "example data schema"
-                #         num_rows = 600
-                #     elif "dataflow" in description:
-                #         data_schema = "Data flow schema"
-                #         num_rows = 30
-                #     else:
-                #         data_schema = "unknown"
-                #         num_rows = 0
-
-                #     # Simulate time delay between submissions (for more realistic testing)
-                #     time.sleep(2)
-
-                # result = {
-                #     "endpoint_name": "model/submit",
-                #     "description": f"{description} {record_type}",
-                #     "data_schema": data_schema,
-                #     "num_rows": num_rows,
-                #     "data_type": params["data_type"],
-                #     "latency": response.elapsed.total_seconds(),
-                #     "status_code": response.status_code,
-                # }
-                # combined_list.append(result)
-
         return combined_list
 
     @task
