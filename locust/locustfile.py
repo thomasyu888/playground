@@ -25,7 +25,7 @@ class ManifestGeneratorUser(HttpUser):
         self.headers = {"Authorization": self.token}
 
     @task
-    def generate_new_manifest_example_model(self):
+    def generate_new_manifest_example_model_gsheet(self):
         params = {
             "schema_url": EXAMPLE_SCHEMA_URL,
             "title": "example",
@@ -40,53 +40,53 @@ class ManifestGeneratorUser(HttpUser):
             else:
                 response.failure(f"Failed to generate manifest. Status code: {response.status_code}")
 
-    # @task
-    # def generate_new_manifest_example_model_excel(self):
-    #     params = {
-    #         "schema_url": EXAMPLE_SCHEMA_URL,
-    #         "title": "example",
-    #         "data_type": "Patient",
-    #         "use_annotations": False,
-    #         "output": "excel"
-    #     }
+    @task
+    def generate_new_manifest_example_model_excel(self):
+        params = {
+            "schema_url": EXAMPLE_SCHEMA_URL,
+            "title": "example",
+            "data_type": "Patient",
+            "use_annotations": False,
+            "output": "excel"
+        }
 
-    #     with self.client.post(self.base_url, json=params, headers=self.headers, catch_response=True) as response:
-    #         if response.status_code == 200:
-    #             response.success()
-    #             print("Manifest (Excel) generated successfully.")
-    #         else:
-    #             response.failure(f"Failed to generate manifest (Excel). Status code: {response.status_code}")
+        with self.client.get("/manifest/generate", params=params, headers=self.headers, catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+                print("Manifest (Excel) generated successfully.")
+            else:
+                response.failure(f"Failed to generate manifest (Excel). Status code: {response.status_code}")
 
-    # @task
-    # def generate_new_manifest_HTAN_google_sheet(self):
-    #     params = {
-    #         "schema_url": HTAN_SCHEMA_URL,
-    #         "title": "example",
-    #         "data_type": "Patient",
-    #         "use_annotations": False
-    #     }
+    @task
+    def generate_new_manifest_HTAN_google_sheet(self):
+        params = {
+            "schema_url": HTAN_SCHEMA_URL,
+            "title": "example",
+            "data_type": "Patient",
+            "use_annotations": False
+        }
 
-    #     with self.client.post(self.base_url, json=params, headers=self.headers, catch_response=True) as response:
-    #         if response.status_code == 200:
-    #             response.success()
-    #             print("HTAN manifest (Google Sheet) generated successfully.")
-    #         else:
-    #             response.failure(f"Failed to generate HTAN manifest. Status code: {response.status_code}")
+        with self.client.get("/manifest/generate", params=params, headers=self.headers, catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+                print("HTAN manifest (Google Sheet) generated successfully.")
+            else:
+                response.failure(f"Failed to generate HTAN manifest. Status code: {response.status_code}")
 
-    # @task
-    # def generate_existing_manifest_google_sheet(self):
-    #     params = {
-    #         "schema_url": EXAMPLE_SCHEMA_URL,
-    #         "title": "example",
-    #         "data_type": "Patient",
-    #         "use_annotations": False,
-    #         "dataset_id": "syn51078367",
-    #         "asset_view": "syn23643253"
-    #     }
+    @task
+    def generate_existing_manifest_google_sheet(self):
+        params = {
+            "schema_url": EXAMPLE_SCHEMA_URL,
+            "title": "example",
+            "data_type": "Patient",
+            "use_annotations": False,
+            "dataset_id": "syn51078367",
+            "asset_view": "syn23643253"
+        }
 
-    #     with self.client.post(self.base_url, json=params, headers=self.headers, catch_response=True) as response:
-    #         if response.status_code == 200:
-    #             response.success()
-    #             print("Existing manifest (Google Sheet) generated successfully.")
-    #         else:
-    #             response.failure(f"Failed to generate existing manifest. Status code: {response.status_code}")
+        with self.client.get("/manifest/generate", params=params, headers=self.headers, catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+                print("Existing manifest (Google Sheet) generated successfully.")
+            else:
+                response.failure(f"Failed to generate existing manifest. Status code: {response.status_code}")
