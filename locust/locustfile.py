@@ -96,6 +96,29 @@ class ManifestGeneratorUser(HttpUser):
             else:
                 response.failure(f"Failed to generate existing manifest. Status code: {response.status_code}")
 
+    @task
+    def populate_manifest(self):
+        """
+        Task to populate the manifest by uploading a CSV file
+        """
+        params = {
+            "schema_url": EXAMPLE_SCHEMA_URL,
+            "data_model_labels": "class_label",
+            "data_type": "Patient",
+            "title": "Example",
+            "return_excel": False
+        }
+        # File to be uploaded
+        file_path_manifest = "test_manifests/synapse_storage_manifest_patient.csv"
+        files = {
+            'csv_file': (os.path.basename(file_path_manifest), open(file_path_manifest, 'rb'), 'text/csv')
+        }
+        # Sending POST request to the API
+        with self.client.post("/manifest/populate", params=params, headers=self.headers, files=files, catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+            else:
+                response.failure(f"Failed with status code {response.status_code}")
 
 
 class AssetStorageUser(HttpUser):
