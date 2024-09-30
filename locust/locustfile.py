@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from locust import HttpUser, task, between
 
@@ -294,3 +295,71 @@ class ManifestValidateUser(HttpUser):
             params=params,
             file_path_manifest="test_manifests/synapse_storage_manifest_HTAN_HMS.csv",
         )
+
+
+class ManifestGenerateAndValidateWorkflowUser(HttpUser):
+
+    def on_start(self):
+        self.project_name = f"Filename Profile Project 3000_{uuid.uuid4()}"
+        self.test_folder_name = f"filename test folder 3000_{uuid.uuid4()}"
+
+        self.dataset_id, self.project_id, self.asset_view_id = CreateTestFiles.create_test_files(
+            num_file=3000,
+            project_name=self.project_name,
+            test_folder_name=self.test_folder_name,
+        )
+
+    def _generate_errors(self, manifest: pd.DataFrame) -> pd.DataFrame:
+        # generate 50% of each type of filename error
+        manifest.iloc[::2,1]=manifest.iloc[::2,1].map(lambda x: f"err {x}")
+        manifest.iloc[1::2,2]=manifest.iloc[1::2,2].map(lambda x: x[:-1:])
+
+        return manifest
+
+    def _save_manifest(self, manifest: pd.DataFrame) -> None:
+        self.manifest_path = f"APITests/test_manifests/filename_{self.num_files}_manifest_{uuid.uuid4()}.csv"
+        manifest.to_csv(self.manifest_path,index=False)
+
+        return
+    def generate_manifest(self) -> pd.DataFrame:
+        # generate manifest as excel file because generating as dataframe is for existing manifests only
+        params = {
+            "schema_url": self.url,
+            "data_type": "MockFilename",
+            "dataset_id": self.dataset_id,
+            "asset_view": self.asset_view_id,
+            "output_format": "excel"
+        }
+        with self.client.get("/manifest/generate", params=params, headers=self.headers, catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+                # TODO Add md5 check for manifest
+                print("Manifest (Excel) generated successfully.")
+                # response from api when generating a manifest as an excel file is a bytes string
+                exel_data = BytesIO(response.content)
+                # openpyxl was best suited to process data of this type
+                workbook = openpyxl.load_workbook(exel_data)
+                manifest_sheet = workbook["Sheet1"]
+
+                # taken from openpyxl documentation on how to process a worksheet with headers and indices into a dataframe
+                data =        cols = next(data)[1:]
+                data = list(data)
+                idx = [r[0] for r in data]
+                data = (islice(r, 1, None) for r in data)
+                manifest = pd.DataFrame(data, index=idx, columns=cols)
+                manifest = manifest.dropna(axis=1,how='all').dropna(axis=0,how="all")
+                manifest.reset_index(drop=False,names='Component',inplace=True)
+
+                manifest = self._generate_errors(manifest)
+                self._save_manifest(manifest)
+            else:
+                response.failure(f"Failed to generate manifest (Excel). Status code: {response.status_code}")
+
+        return
+    
+    def on_stop(self):
+        if hasattr(self, "project_id"):
+            CreateTestFiles.delete_resource(self.project_id)
+        if hasattr(self, "manifest_path"):
+            os.remove(self.manifest_path)
+        return
