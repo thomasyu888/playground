@@ -1,5 +1,4 @@
 import os
-import uuid
 
 from locust import HttpUser, task, between
 
@@ -377,6 +376,7 @@ class VisualizeUser(HttpUser):
         self.token = f"Bearer {os.environ['TOKEN']}"
         self.headers = {"Authorization": self.token}
 
+    @task
     def get_attributes(self):
         params = {
             "schema_url": EXAMPLE_SCHEMA_URL,
