@@ -11,11 +11,11 @@ HTAN_SCHEMA_URL = (
 
 DATA_FLOW_SCHEMA_URL = "https://raw.githubusercontent.com/Sage-Bionetworks/data_flow_config/main/HTAN/dataflow_component.csv"
 
-class VersionCheckUser(HttpUser):
-    fixed_count = 1
-    @task
-    def get_version(self):
-        self.client.get("/version")
+# class VersionCheckUser(HttpUser):
+#     fixed_count = 1
+#     @task
+#     def get_version(self):
+#         self.client.get("/version")
 
 
 class ManifestGeneratorUser(HttpUser):
