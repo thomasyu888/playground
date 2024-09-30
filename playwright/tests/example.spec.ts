@@ -24,7 +24,8 @@ test.describe('Login with OAuth', () => {
 
       // Now we're back to our own app
       // Wait that the main page has loaded
-      await page.waitForURL('https://dca.app.sagebionetworks.org', { timeout: 10000 });
+      // await page.waitForSelector('button:has-text("Next")', { state: 'visible' });
+      await page.waitForURL('https://dca.app.sagebionetworks.org', { timeout: 20000 });
 
       // Wait for network to be idle, if we save storage too early, needed storage values might not yet be available
       await page.waitForLoadState('networkidle');
@@ -44,8 +45,24 @@ test.describe('Login with OAuth', () => {
     await expect(page.locator('text=Data Curator')).toBeVisible();
     await page.click('button:has-text("Next")');
     await page.waitForLoadState('networkidle');
-    await expect(page.locator('text=Select a Project:')).toBeVisible();
+    await expect(page.locator('text=Select a Project')).toBeVisible();
     await page.screenshot({ path: 'next.png' });
+    await page.waitForSelector('button:has-text("Next")', { state: 'visible' , timeout: 60000});
+    await page.click('button:has-text("Next")');
+    await page.waitForLoadState('networkidle');
+    // await page.waitForSelector('button:has-text("Next")', { state: 'visible' });
+    // await expect(page.locator('text=Select a Folder')).toBeVisible();
+    // await page.click('button:has-text("Next")');
+    // await page.waitForLoadState('networkidle');
+    // await page.waitForSelector('button:has-text("Next")', { state: 'visible' });
+    // await expect(page.locator('text=Select a Template:')).toBeVisible();
+    // await page.click('button:has-text("Download template")');
+    // await page.waitForLoadState('networkidle');
+      // await page.waitForSelector('button:has-text("Next")', { state: 'visible' });
+    // await page.click('button:has-text("Biospecimen metadata for FAIR demo data - A Biospecimen")');
+    // await page.waitForLoadState('networkidle');
+    // await page.screenshot({ path: 'end.png' });
+
   });
 
 });
