@@ -367,3 +367,68 @@ class ManifestValidateUser(HttpUser):
 #             else:
 #                 response.failure(f"Failed to generate manifest (Excel). Status code: {response.status_code}")
 
+
+
+class VisualizeUser(HttpUser):
+    wait_time = between(1, 5)
+
+    def on_start(self):
+        # Optionally authenticate or set up other necessary state here
+        self.token = f"Bearer {os.environ['TOKEN']}"
+        self.headers = {"Authorization": self.token}
+
+    def get_attributes(self):
+        params = {
+            "schema_url": EXAMPLE_SCHEMA_URL,
+            "data_model_labels": "class_label"
+        }
+        with self.client.get("/visualize/attributes", headers=self.headers, params=params, catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+                print(f"Attributes fetched successfully with params: {params}.")
+            else:
+                response.failure(f"Failed to fetch attributes. Status code: {response.status_code}, Params: {params}")
+
+    @task
+    def get_component(self):
+        params = {
+            "schema_url": EXAMPLE_SCHEMA_URL,
+            "component": "Patient",
+            "include_index": "false",
+            "data_model_labels": "class_label"
+        }
+        with self.client.get("/visualize/component", headers=self.headers, params=params, catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+                print(f"Component fetched successfully with params: {params}.")
+            else:
+                response.failure(f"Failed to fetch component. Status code: {response.status_code}, Params: {params}")
+
+    @task
+    def get_tangled_tree_layers(self):
+        params = {
+            "schema_url": EXAMPLE_SCHEMA_URL,
+            "figure_type": "component",
+            "data_model_labels": "class_label"
+        }
+        with self.client.get("/visualize/tangled_tree/layers", headers=self.headers, params=params, catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+                print(f"Tangled tree layers fetched successfully with params: {params}.")
+            else:
+                response.failure(f"Failed to fetch tangled tree layers. Status code: {response.status_code}, Params: {params}")
+
+    @task
+    def get_tangled_tree_text(self):
+        params = {
+            "schema_url": EXAMPLE_SCHEMA_URL,
+            "figure_type": "component",
+            "text_format": "plain",
+            "data_model_labels": "class_label"
+        }
+        with self.client.get("/visualize/tangled_tree/text", headers=self.headers, params=params, catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+                print(f"Tangled tree text fetched successfully with params: {params}.")
+            else:
+                response.failure(f"Failed to fetch tangled tree text. Status code: {response.status_code}, Params: {params}")
