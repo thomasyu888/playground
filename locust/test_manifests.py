@@ -11,7 +11,7 @@ syn = synapseclient.login()
 HTAN_SCHEMA_URL = "https://raw.githubusercontent.com/ncihtan/data-models/v24.7.1/HTAN.model.jsonld" 
 AD_SCHEMA_URL = "https://raw.githubusercontent.com/adknowledgeportal/data-models/main/AD.model.jsonld"
 NF_SCHEMA_URL = "https://raw.githubusercontent.com/nf-osi/nf-metadata-dictionary/v9.7.0/NF.jsonld"
-BASE_URL = "https://schematic-dev.api.sagebionetworks.org/v1"
+BASE_URL = "https://schematic-staging.api.sagebionetworks.org/v1"
 AUTH =  f"Bearer {os.environ['TOKEN']}"
 HEADERS = {"Authorization": AUTH}
 
