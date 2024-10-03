@@ -13,6 +13,8 @@ BASE_URL = 'https://schematic-dev.api.sagebionetworks.org/v1'
 TOKEN = f"Bearer {os.environ['TOKEN']}"
 HEADERS = {"Authorization": TOKEN}
 EXAMPLE_SCHEMA_URL = "https://raw.githubusercontent.com/Sage-Bionetworks/schematic/develop/tests/data/example.model.jsonld"
+
+
 @pytest.fixture(scope='module')
 def setup_api():
     # Assuming the API is running locally
@@ -22,99 +24,7 @@ def setup_api():
     return BASE_URL
 
 
-@pytest.fixture
-def manifest_params():
-    return {
-        "schema_url": EXAMPLE_SCHEMA_URL,
-        "title": "Example",
-        "data_type": "Patient",
-        "use_annotations": False,
-        "dataset_id": None,
-        "asset_view": None,
-        "output_format": "excel",
-        "strict_validation": True
-    }
-
-
-def calculate_md5(file_path):
-    md5_hash = hashlib.md5()
-
-    # Open the file in binary mode and read in chunks
-    with open(file_path, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            md5_hash.update(chunk)
-
-    # Get the hexadecimal MD5 hash
-    return md5_hash.hexdigest()
-
-
-# def test_submit_file_manifest(setup_api):
-#     url = f'{setup_api}/model/submit'
-#     params = {
-#         'schema_url': 'https://raw.githubusercontent.com/Sage-Bionetworks/schematic/develop/tests/data/example.model.jsonld',
-#         'data_model_labels': 'class_label',
-#         'manifest_record_type': 'file_only',
-#         'dataset_id': 'syn63561474',
-#         'asset_view': 'syn63561606'
-#     }
-    
-#     files = {'file_name': open('Example_Biospecimen.csv', 'rb')}  # Mock file
-
-#     response = requests.post(url, params=params, files=files, headers=HEADERS)
-    
-#     assert response.status_code == 200, f"Failed to submit manifest: {response.text}"
-#     assert 'synapse_id' in response.json(), "Manifest submission did not return synapse ID"
-
-# def test_submit_annotated_manifest(setup_api):
-#     url = f'{setup_api}/model/submit'
-#     params = {
-#         'schema_url': 'https://raw.githubusercontent.com/Sage-Bionetworks/schematic/develop/tests/data/example.model.jsonld',
-#         'data_model_labels': 'class_label',
-#         'file_annotations_upload': True,
-#         'manifest_record_type': 'table_and_file',
-#         'dataset_id': 'syn63561911',
-#         'asset_view': 'syn63561920'
-#     }
-
-#     files = {'file_name': open('Annotated_BulkRNA_manifest.csv', 'rb')}  # Mock file
-
-#     response = requests.post(url, params=params, files=files, headers=HEADERS)
-    
-#     assert response.status_code == 200, f"Failed to submit annotated manifest: {response.text}"
-#     assert 'synapse_id' in response.json(), "Manifest submission did not return synapse ID"
-
-
-# def test_validate_manifest(setup_api):
-#     url = f'{setup_api}/model/validate'
-#     params = {
-#         'schema_url': 'https://raw.githubusercontent.com/Sage-Bionetworks/schematic/develop/tests/data/example.model.jsonld',
-#         'data_type': 'Patient'
-#     }
-
-#     files = {'file_name': open('Valid_Patient_Manifest.csv', 'rb')}  # Mock file
-
-#     response = requests.post(url, params=params, files=files, headers=HEADERS)
-    
-#     assert response.status_code == 200, f"Manifest validation failed: {response.text}"
-#     assert 'warnings' not in response.json(), "Unexpected warnings during validation"
-#     assert 'errors' not in response.json(), "Validation errors found"
-
-
-# def test_validate_invalid_manifest(setup_api):
-#     url = f'{setup_api}/model/validate'
-#     params = {
-#         'schema_url': 'https://raw.githubusercontent.com/Sage-Bionetworks/schematic/develop/tests/data/example.model.jsonld',
-#         'data_type': 'Patient'
-#     }
-
-#     files = {'file_name': open('Invalid_Patient_Manifest.csv', 'rb')}  # Mock invalid file
-
-#     response = requests.post(url, params=params, files=files)
-    
-#     assert response.status_code == 200, f"Manifest validation failed: {response.text}"
-#     assert 'errors' in response.json(), "Expected validation errors"
-
-def test_validate_manifest_valid(setup_api, manifest_params):
+def test_validate_manifest_valid(setup_api):
     """https://sagebionetworks.jira.com/wiki/spaces/SCHEM/pages/3055779846/Schematic+API+test+plan#Manifest-validation
     Test that we can validate a simple manifest and expect no errors.
 
@@ -144,7 +54,7 @@ def test_validate_manifest_valid(setup_api, manifest_params):
     assert response.status_code == 200, "Should be 200 status code"
 
 
-def test_validate_manifest_invalid_patient_manifest(setup_api, manifest_params):
+def test_validate_manifest_invalid_patient_manifest(setup_api):
     """
     https://sagebionetworks.jira.com/wiki/spaces/SCHEM/pages/3055779846/Schematic+API+test+plan#Manifest-validation
     Test that a manifest is invalid
