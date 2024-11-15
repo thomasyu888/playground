@@ -36,4 +36,6 @@ apply_annotations <- function(row) {
   }
 }
 
+individual_LC_mice <- read.csv("my/file/here")
+
 apply(individual_LC_mice, 1, apply_annotations)
