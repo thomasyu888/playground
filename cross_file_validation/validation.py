@@ -172,6 +172,29 @@ class SynapseValidator:
         return results
 
 
+def parse_json_logs_to_dataframe(log_file_path: str) -> pd.DataFrame:
+    """
+    Parses a log file where each line is a JSON-formatted log entry
+    and converts it into a Pandas DataFrame.
+
+    Args:
+        log_file_path (str): Path to the log file.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the parsed log entries.
+    """
+    log_entries = []
+    with open(log_file_path, 'r') as file:
+        for line in file:
+            try:
+                log_entry = json.loads(line.strip())
+                log_entries.append(log_entry)
+            except json.JSONDecodeError as e:
+                print(f"Failed to parse line: {line.strip()} - {e}")
+
+    # Convert the list of dictionaries into a DataFrame
+    return pd.DataFrame(log_entries)
+
 def main():
     syn = synapseclient.login()
     # Example list of Synapse ID and column name pairs
@@ -194,6 +217,8 @@ def main():
     # Perform validation
     results = validator.validate()
     print("Validation Results:", results)
+    validation_results_df = parse_json_logs_to_dataframe("validation_results.json")
+    validation_results_df.to_csv("validation_results.csv", index=False)
 
 
 if __name__ == '__main__':
