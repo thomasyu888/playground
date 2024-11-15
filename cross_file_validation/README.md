@@ -11,7 +11,7 @@ Termnology
 
 > [!NOTE]
 > This is a PoC, and may run into type issues. Due to the differences from pandas reading in dataframes with NA/blank values, this is most stable when comparing string columns currently.
-> The script will also fail spectacularly if you specify a column that doesn't exist in any of the files or if you don't have access to the file.  The log file `validation_results.json` will be appended to so if you don't want that, you will need to delete it before running the script.
+> The script will also fail spectacularly if you specify a column that doesn't exist in any of the files or if you don't have access to the file.  The log file `validation_results.json` will be appended to so if you don't want that, you will need to delete it before running the script. This only works for CSV's right now.
 
 ## Usage
 
