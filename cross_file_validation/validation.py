@@ -1,3 +1,4 @@
+import argparse
 from dataclasses import dataclass
 from datetime import datetime
 import logging
@@ -195,22 +196,78 @@ def parse_json_logs_to_dataframe(log_file_path: str) -> pd.DataFrame:
     # Convert the list of dictionaries into a DataFrame
     return pd.DataFrame(log_entries)
 
-def main():
-    syn = synapseclient.login()
-    # Example list of Synapse ID and column name pairs
-    synapse_data = [
-        ('syn52955031', 'specimenID'),
-        ('syn58849847', 'specimenID'),
+
+def parse_arguments():
+    """
+    Parses command-line arguments for Synapse validation script.
+
+    Returns:
+        argparse.Namespace: Parsed arguments containing Synapse data, reference Synapse ID, and reference column.
+    """
+    parser = argparse.ArgumentParser(
+        description="Validate Synapse data against a reference file."
+    )
+
+    # Add arguments
+    parser.add_argument(
+        "--target-synapse-ids",
+        required=True,
+        nargs="+",
+        metavar=("SYNAPSE_ID", "COLUMN"),
+        help=(
+            "Pairs of Synapse IDs and their corresponding columns. "
+            "Provide in the format: SYNAPSE_ID COLUMN. "
+            "Example: --synapse-data syn52955031 specimenID syn58849847 specimenID"
+        ),
+    )
+    parser.add_argument(
+        "--reference-synapse-id",
+        required=True,
+        type=str,
+        help="The Synapse ID of the reference file. Example: 'syn62661392'.",
+    )
+    parser.add_argument(
+        "--reference-column",
+        required=True,
+        type=str,
+        help="The column in the reference file to validate against. Example: 'individualID'.",
+    )
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Convert the synapse-data pairs into a list of tuples
+    if len(args.target_synapse_ids) % 2 != 0:
+        parser.error("--synapse-data must be provided as pairs of SYNAPSE_ID and COLUMN.")
+
+    args.target_synapse_ids = [
+        (args.target_synapse_ids[i], args.target_synapse_ids[i + 1])
+        for i in range(0, len(args.target_synapse_ids), 2)
     ]
 
+    return args
+
+def main():
+    args = parse_arguments()
+    syn = synapseclient.login()
+    # Example list of Synapse ID and column name pairs
+    # synapse_data = [
+    #     ('syn52955031', 'specimenID'),
+    #     ('syn58849847', 'specimenID'),
+    # ]
     # Synapse ID of the reference file
-    reference_synapse_id = 'syn62661392'
+    # reference_synapse_id = 'syn62661392'
+    # reference_column = "individualID"
+
+    target_synapse_ids = args.target_synapse_ids
+    reference_synapse_id = args.reference_synapse_id
+    reference_column = args.reference_column
 
     # Initialize SynapseValidator
     validator = SynapseValidator(
-        target_synapse_ids=synapse_data,
+        target_synapse_ids=target_synapse_ids,
         reference_synapse_id=reference_synapse_id,
-        reference_column='individualID',
+        reference_column=reference_column,
         syn=syn
     )
 

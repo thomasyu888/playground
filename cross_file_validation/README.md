@@ -1,6 +1,6 @@
 ## cross file validation
 
-This is a PoC around cross file validation.  By replacing the synapse ids and the columns you want in the `validation.py` script
+This is a PoC around cross file validation.  By specifying the synapse ids and the columns you want in the `validation.py` script
 you can achieve cross file validation to ensure values in a column in a CSV are a subset of values in the reference file.
 
 Termnology
@@ -14,5 +14,5 @@ Termnology
 By running this code, it will create a `validation_results.json` that will automatically log the validation results.
 ```
 pip install synapseclient
-python validation.py
+python validation.py --target-synapse-ids syn52955031 specimenID syn58849847 specimenID --reference-synapse-id syn62661392 --reference-column individualID
 ```
