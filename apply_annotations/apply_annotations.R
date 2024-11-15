@@ -1,7 +1,5 @@
 library(synapser)
 synLogin()
-entity = "syn4990358"
-
 
 # Function to apply annotations to an entity
 apply_annotations <- function(row, columns) {
@@ -15,15 +13,16 @@ apply_annotations <- function(row, columns) {
       old_annots <- synGetAnnotations(entity)
       
       # Prepare annotations dynamically based on provided columns
-      annotations <- lapply(columns, function(col) as.character(row[col]))
+      annotations <- lapply(columns, function(col) row[col])
       names(annotations) <- names(columns)
       
       # Merge old and new annotations, resolve duplicates
-      entity$annotations <- c(old_annots, annotations)
-      # entity$annotations <- entity$annotations[!duplicated(names(entity$annotations), fromLast = TRUE)]
+      merged_annotations <- c(old_annots, annotations)
+      entity$annotations <- merged_annotations[!duplicated(names(merged_annotations), fromLast = TRUE)]
       
       # Store updated entity
-      synStore(entity)
+      # Set this to be to NOT increment the version
+      synStore(entity, forceVersion=F)
       
     }, error = function(e) {
       # Print a useful error message
