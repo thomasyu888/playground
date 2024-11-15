@@ -9,6 +9,10 @@ Termnology
 * Target file(s): The file(s) that you want to validate.
 * Target column: The column in the target file that you want to validate.
 
+> [!NOTE]
+> This is a PoC, and may run into type issues. Due to the differences from pandas reading in dataframes with NA/blank values, this is most stable when comparing string columns currently.
+> The script will also fail spectacularly if you specify a column that doesn't exist in any of the files
+
 ## Usage
 
 ### Using the CLI
