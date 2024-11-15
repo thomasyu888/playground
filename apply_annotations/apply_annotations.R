@@ -4,38 +4,50 @@ entity = "syn4990358"
 
 
 # Function to apply annotations to an entity
-apply_annotations <- function(row) {
-  entity_id <- as.character(row["entityId"])
+apply_annotations <- function(row, columns) {
+  entity_id <- as.character(row['entityId'])
   
   if (!is.na(entity_id) && entity_id != "") {
-    try({
-      # Retrieve the entity
-      entity <- synGet(entity_id, downloadFile=F)
-      old_annots = synGetAnnotations(entity)
-      # Prepare annotations
-      annotations <- list(
-        specimenID = row["specimenID"],
-        individualID = row["individualID"],
-        assay = row["measurementTechnique"],
-        species = row["species"],
-        consortium = row["consortium"],
-        studyKey = row["studyKey"],
-        project = row["project"],
-        grant = row["grant"],
-        analysisType = row["analysisType"],
-        isModelSystem = row["isModelSystem"],
-        familyStudyParticipant = row["familyStudyParticipant"]
-      )
-      ent$annotations <- c(old_annots, annotations)
-      synStore(ent)
-      # Set annotations
-      #synSetAnnotations(entity, annotations)
-    }, silent = TRUE)
+    message(sprintf("annotating %s", entity_id))
+    tryCatch({
+     # Retrieve the entity
+      entity <- synGet(entity_id, downloadFile = FALSE)
+      old_annots <- synGetAnnotations(entity)
+      
+      # Prepare annotations dynamically based on provided columns
+      annotations <- lapply(columns, function(col) as.character(row[col]))
+      names(annotations) <- names(columns)
+      
+      # Merge old and new annotations, resolve duplicates
+      entity$annotations <- c(old_annots, annotations)
+      # entity$annotations <- entity$annotations[!duplicated(names(entity$annotations), fromLast = TRUE)]
+      
+      # Store updated entity
+      synStore(entity)
+      
+    }, error = function(e) {
+      # Print a useful error message
+      message(sprintf(
+        "Error annotating entityId '%s': %s", 
+        entity_id, 
+        e$message
+      ))
+    })
   } else {
     message(sprintf("Invalid entityId for row with entityId: %s", entity_id))
   }
 }
 
-individual_LC_mice <- read.csv("my/file/here")
 
-apply(individual_LC_mice, 1, apply_annotations)
+# Define column mappings
+# exampleAnnotation is what will be on Synapse and
+# example_annotation is what the column name in your csv
+column_mappings <- list(
+  exampleAnnotation = "example_annotation",
+  example2Annotation = "example_2_annotation"
+)
+
+my_manifest_df = read.csv("my_example_manifest.csv")
+
+# Apply annotations function to each row
+apply(my_manifest_df, 1, function(row) apply_annotations(row, column_mappings))
