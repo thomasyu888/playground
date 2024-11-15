@@ -10,7 +10,7 @@ apply_annotations <- function(row, columns) {
   if (!is.na(entity_id) && entity_id != "") {
     message(sprintf("annotating %s", entity_id))
     tryCatch({
-     # Retrieve the entity
+      # It's important to set downloadFile=F or you'll be downloading the file.
       entity <- synGet(entity_id, downloadFile = FALSE)
       old_annots <- synGetAnnotations(entity)
       
