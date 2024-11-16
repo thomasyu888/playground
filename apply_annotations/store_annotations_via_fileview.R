@@ -4,9 +4,13 @@ synLogin()
 
 # Put in a personal project id here
 project_id = "syn64097735"
-
+your_manifest_file = "my_example_manifest.csv"
 # build a synapse table just to get the schema constraints, you can delete this after
-mock_table = synBuildTable("Test table foo", parent = project_id, values = "my_example_manifest.csv")
+mock_table = synBuildTable(
+  "Test table foo",
+  parent = project_id,
+  values = your_manifest_file
+)
 mock_table = synStore(mock_table)
 
 # Create a mock entity view just to do the annotation
