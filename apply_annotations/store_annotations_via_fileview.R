@@ -3,23 +3,24 @@ library(synapser)
 synLogin()
 
 # Put in a personal project id here
-project_id = "syn64097735"
+private_project_id = "syn64097735"
 your_manifest_file = "my_example_manifest.csv"
+# Add the scope of a fileview here (this is the list of your files)
+scopes = c("syn64097735")
+
 # build a synapse table just to get the schema constraints, you can delete this after
 mock_table = synBuildTable(
   "Test table foo",
-  parent = project_id,
+  parent = private_project_id,
   values = your_manifest_file
 )
 mock_table = synStore(mock_table)
 
 # Create a mock entity view just to do the annotation
-# Add the scope of a fileview here
-scopes = c("syn64097735")
 entity_view = EntityViewSchema(
   "mock project view",
   columns=mock_table$schema$properties$columnIds,
-  parent=project_id,
+  parent=private_project_id,
   scopes=,
   addAnnotationColumns=FALSE,
   includeEntityTypes=c(EntityViewType$FILE)
@@ -37,7 +38,9 @@ table_view_df = as.data.frame(table_view)
 my_manifest_df = read.csv("my_example_manifest.csv")
 
 # Don't include your manifest columns
-table_view_filtered <- table_view_df[, !(colnames(table_view_df) %in% colnames(my_manifest_df))]
+table_view_filtered <- table_view_df[
+  , !(colnames(table_view_df) %in% colnames(my_manifest_df))
+]
 
 # Merge the blank values from your fileview
 final_view = merge.data.frame(
