@@ -58,7 +58,7 @@ def setup_custom_json_logger(name: str, log_file: str = None, level: int = loggi
 JSONLOGGER = setup_custom_json_logger(name="custom_json_logger", log_file="validation_results.json")
 
 
-def cross_validate_dataframe(dataframe: pd.DataFrame, column: str, reference_df: pd.DataFrame, reference_column: str) -> bool:
+def _cross_validate_dataframe(dataframe: pd.DataFrame, column: str, reference_df: pd.DataFrame, reference_column: str) -> bool:
     """
     Validates that all values in the specified column of a dataframe
     exist in the specified column of a reference dataframe.
@@ -84,67 +84,6 @@ def cross_validate_dataframe(dataframe: pd.DataFrame, column: str, reference_df:
     reference_values = set(reference_df[reference_column])
     column_values = set(dataframe[column])
     return column_values.issubset(reference_values)
-
-
-@dataclass
-class SynapseEntityCrossFileValidator:
-    """
-    A class to manage Synapse IDs and their paired columns for validation
-    using DataFrameValidator via composition.
-
-    Attributes:
-        synapse_id (str): The Synapse ID of the target file.
-        column (str): The column in the target file for validation.
-        reference_synapse_id (str): The Synapse ID of the reference file.
-        reference_column (str): The column in the reference file for validation.
-        syn (synapseclient.Synapse): The Synapse client instance.
-        is_valid (Optional[bool]): Validation status, default is None.
-    """
-    synapse_id: str
-    column: str
-    reference_synapse_id: str
-    reference_column: str
-    syn: synapseclient.Synapse
-    is_valid: Optional[bool] = None
-
-    def __post_init__(self):
-        self.reference_df = self.read_synapse_file(synapse_id=self.reference_synapse_id, column=self.reference_column)
-        self.dataframe = self.read_synapse_file(synapse_id=self.synapse_id, column=self.column)
-
-    def read_synapse_file(self, synapse_id: str, column: str = None) -> pd.DataFrame:
-        """
-        Downloads a file from Synapse using its Synapse ID and loads it as a dataframe.
-
-        Parameters:
-            synapse_id (str): The Synapse ID of the file to download.
-
-        Returns:
-            pd.DataFrame: A dataframe created from the downloaded file.
-        """
-        try:
-            entity = self.syn.get(synapse_id)
-        except Exception as e:
-            raise RuntimeError(f"Failed to download Synapse ID {synapse_id}: {e}")
-        return pd.read_csv(entity.path, usecols=[column])
-
-    def validate(self) -> dict:
-        """
-        Validates all Synapse files against the reference dataframe.
-
-        Returns:
-            dict: A dictionary mapping Synapse IDs to their validation results (True/False).
-        """
-        # for synapse_id, validate_column in self.target_synapse_ids:
-        #     print(f"Validating Synapse ID: {synapse_id} on column: {validate_column} against reference: {self.reference_synapse_id} on column: {self.reference_column}")
-        try:
-            # Download and create DataFrameValidator
-            is_valid = cross_validate_dataframe(self.dataframe, self.column, self.reference_df, self.reference_column)
-            # Perform validation
-            JSONLOGGER.info('Valid' if is_valid else 'Invalid', extra={"extra": {"target_synapse_id": self.synapse_id, "target_column": self.column, "reference_synapse_id": self.reference_synapse_id, "reference_column": self.reference_column, "is_valid": is_valid}})
-        except Exception as e:
-            JSONLOGGER.error(f"Error validating Synapse ID {self.synapse_id}: {e}", extra={"extra": {"target_synapse_id": self.synapse_id, "target_column": self.column, "reference_synapse_id": self.reference_synapse_id, "reference_column": self.reference_column, "is_valid": is_valid}})
-        self.is_valid = is_valid
-        return self.is_valid
 
 
 def parse_json_logs_to_dataframe(log_file_path: str) -> pd.DataFrame:
@@ -221,6 +160,30 @@ def parse_arguments():
 
     return args
 
+
+@dataclass
+class DataReader:
+    path_or_identifier: str
+    # TODO create a client class that abstracts the implementation details of S3 or any getter
+    client: Optional[synapseclient.Synapse] = None
+    dataframe: Optional[pd.DataFrame] = None
+
+    def read_data(self):
+        """
+        Downloads the required files and prepares dataframes.
+        """
+        data = self.client.get(self.path_or_identifier)
+        self.dataframe = pd.read_csv(data.path)
+
+
+def cross_validation(client, source, source_column, reference, reference_column):
+    source_reader = DataReader(path_or_identifier=source, client=client)
+    source_reader.read_data()
+    reference_reader = DataReader(path_or_identifier=reference, client=client)
+    reference_reader.read_data()
+    return _cross_validate_dataframe(source_reader.dataframe, source_column, reference_reader.dataframe, reference_column)
+
+
 def main():
     args = parse_arguments()
     syn = synapseclient.login()
@@ -239,17 +202,7 @@ def main():
 
     for synapse_id, validate_column in target_synapse_ids:
         print(f"Validating Synapse ID: {synapse_id} on column: {validate_column} against reference: {reference_synapse_id} on column: {reference_column}")
-
-        # Initialize SynapseValidator
-        validator = SynapseEntityCrossFileValidator(
-            synapse_id=synapse_id,
-            column=validate_column,
-            reference_synapse_id=reference_synapse_id,
-            reference_column=reference_column,
-            syn=syn
-        )
-        # Perform validation
-        results = validator.validate()
+        results = cross_validation(client=syn, source=synapse_id, source_column=validate_column, reference=reference_synapse_id, reference_column=reference_column)
         print("Validation Results:", results)
     validation_results_df = parse_json_logs_to_dataframe("validation_results.json")
     validation_results_df.to_csv("validation_results.csv", index=False)
