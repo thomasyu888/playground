@@ -2,6 +2,7 @@ import argparse
 from dataclasses import dataclass
 from datetime import datetime
 import logging
+from typing import Optional
 
 import pandas as pd
 import synapseclient
@@ -57,80 +58,58 @@ def setup_custom_json_logger(name: str, log_file: str = None, level: int = loggi
 JSONLOGGER = setup_custom_json_logger(name="custom_json_logger", log_file="validation_results.json")
 
 
-@dataclass
-class DataFrameValidator:
+def cross_validate_dataframe(dataframe: pd.DataFrame, column: str, reference_df: pd.DataFrame, reference_column: str) -> bool:
     """
-    A class to represent a dataframe and its corresponding column for validation.
-
-    Attributes:
-        dataframe (pd.DataFrame): The dataframe to validate.
-        column (str): The column name in the dataframe to validate.
-    """
-    dataframe: pd.DataFrame
-    column: str
-
-    def __post_init__(self):
-        if not isinstance(self.dataframe, pd.DataFrame):
-            raise TypeError(f"Expected 'dataframe' to be a pandas DataFrame, got {type(self.dataframe).__name__} instead.")
-
-    def validate(self, reference_df, reference_column):
-        """
-        Validates that all values in the specified column of the dataframe
-        exist in the specified column of a reference dataframe.
-
-        Args:
-            reference_df (pd.DataFrame): The reference dataframe.
-            reference_column (str): The column in the reference dataframe to check against.
-
-        Returns:
-            bool: True if all values in the dataframe's column exist in the reference column.
-        """
-        if reference_column not in reference_df.columns:
-            raise ValueError(f"Reference column '{reference_column}' not found in reference dataframe.")
-        
-        if self.column not in self.dataframe.columns:
-            return False  # Column not found
-
-        reference_values = set(reference_df[reference_column])
-        column_values = set(self.dataframe[self.column])
-        return column_values.issubset(reference_values)
-
-
-def validate_multiple_dataframes(reference_df: pd.DataFrame, reference_column: str, target_dataframes: list[DataFrameValidator]):
-    """
-    Validates multiple dataframes against a reference dataframe using the DataFrameValidator class.
+    Validates that all values in the specified column of a dataframe
+    exist in the specified column of a reference dataframe.
 
     Parameters:
-        reference_df (pd.DataFrame): The dataframe containing the reference column.
-        reference_column (str): The column in the reference dataframe to check against.
-        dataframe_validators (list of DataFrameValidator): A list of DataFrameValidator objects.
+        dataframe (pd.DataFrame): The dataframe to validate.
+        column (str): The column in the dataframe to validate.
+        reference_df (pd.DataFrame): The reference dataframe.
+        reference_column (str): The column in the reference dataframe to validate against.
 
     Returns:
-        dict: A dictionary where keys are indices of the validators and values are True (valid) or False (invalid).
+        bool: True if all values in the dataframe's column exist in the reference column; otherwise, False.
     """
-    results = {}
-    for idx, validator in enumerate(target_dataframes):
-        results[idx] = validator.validate(reference_df, reference_column)
-    return results
+    if not isinstance(dataframe, pd.DataFrame):
+        raise TypeError(f"Expected 'dataframe' to be a pandas DataFrame, got {type(self.dataframe).__name__} instead.")
+    if not isinstance(reference_df, pd.DataFrame):
+        raise TypeError(f"Expected 'reference_df' to be a pandas DataFrame, got {type(self.dataframe).__name__} instead.")
+    if reference_column not in reference_df.columns:
+        raise ValueError(f"Reference column '{reference_column}' not found in reference_df.")
+    if column not in dataframe.columns:
+        raise ValueError(f"column '{column}' not found in dataframe.")
+
+    reference_values = set(reference_df[reference_column])
+    column_values = set(dataframe[column])
+    return column_values.issubset(reference_values)
+
 
 @dataclass
-class SynapseValidator:
+class SynapseEntityCrossFileValidator:
     """
     A class to manage Synapse IDs and their paired columns for validation
     using DataFrameValidator via composition.
 
     Attributes:
-        synapse_data (List[Tuple[str, str]]): A list of tuples containing Synapse IDs and their corresponding column names.
-        reference_df (pd.DataFrame): The reference dataframe.
-        reference_column (str): The column in the reference dataframe for validation.
+        synapse_id (str): The Synapse ID of the target file.
+        column (str): The column in the target file for validation.
+        reference_synapse_id (str): The Synapse ID of the reference file.
+        reference_column (str): The column in the reference file for validation.
+        syn (synapseclient.Synapse): The Synapse client instance.
+        is_valid (Optional[bool]): Validation status, default is None.
     """
-    target_synapse_ids: list[tuple[str, str]]
+    synapse_id: str
+    column: str
     reference_synapse_id: str
     reference_column: str
     syn: synapseclient.Synapse
+    is_valid: Optional[bool] = None
 
     def __post_init__(self):
         self.reference_df = self.read_synapse_file(synapse_id=self.reference_synapse_id, column=self.reference_column)
+        self.dataframe = self.read_synapse_file(synapse_id=self.synapse_id, column=self.column)
 
     def read_synapse_file(self, synapse_id: str, column: str = None) -> pd.DataFrame:
         """
@@ -155,22 +134,17 @@ class SynapseValidator:
         Returns:
             dict: A dictionary mapping Synapse IDs to their validation results (True/False).
         """
-        results = {}
-        for synapse_id, validate_column in self.target_synapse_ids:
-            print(f"Validating Synapse ID: {synapse_id} on column: {validate_column} against reference: {self.reference_synapse_id} on column: {self.reference_column}")
-            try:
-                # Download and create DataFrameValidator
-                df = self.read_synapse_file(synapse_id=synapse_id, column=validate_column)
-                validator = DataFrameValidator(df, validate_column)
-
-                # Perform validation
-                is_valid = validator.validate(self.reference_df, self.reference_column)
-                results[synapse_id] = is_valid
-                JSONLOGGER.info('Valid' if is_valid else 'Invalid', extra={"extra": {"target_synapse_id": synapse_id, "target_column": validate_column, "reference_synapse_id": self.reference_synapse_id, "reference_column": self.reference_column, "is_valid": is_valid}})
-            except Exception as e:
-                JSONLOGGER.error(f"Error validating Synapse ID {synapse_id}: {e}", extra={"extra": {"target_synapse_id": synapse_id, "target_column": validate_column, "reference_synapse_id": self.reference_synapse_id, "reference_column": self.reference_column, "is_valid": is_valid}})
-                results[synapse_id] = False
-        return results
+        # for synapse_id, validate_column in self.target_synapse_ids:
+        #     print(f"Validating Synapse ID: {synapse_id} on column: {validate_column} against reference: {self.reference_synapse_id} on column: {self.reference_column}")
+        try:
+            # Download and create DataFrameValidator
+            is_valid = cross_validate_dataframe(self.dataframe, self.column, self.reference_df, self.reference_column)
+            # Perform validation
+            JSONLOGGER.info('Valid' if is_valid else 'Invalid', extra={"extra": {"target_synapse_id": self.synapse_id, "target_column": self.column, "reference_synapse_id": self.reference_synapse_id, "reference_column": self.reference_column, "is_valid": is_valid}})
+        except Exception as e:
+            JSONLOGGER.error(f"Error validating Synapse ID {self.synapse_id}: {e}", extra={"extra": {"target_synapse_id": self.synapse_id, "target_column": self.column, "reference_synapse_id": self.reference_synapse_id, "reference_column": self.reference_column, "is_valid": is_valid}})
+        self.is_valid = is_valid
+        return self.is_valid
 
 
 def parse_json_logs_to_dataframe(log_file_path: str) -> pd.DataFrame:
@@ -263,17 +237,20 @@ def main():
     reference_synapse_id = args.reference_synapse_id
     reference_column = args.reference_column
 
-    # Initialize SynapseValidator
-    validator = SynapseValidator(
-        target_synapse_ids=target_synapse_ids,
-        reference_synapse_id=reference_synapse_id,
-        reference_column=reference_column,
-        syn=syn
-    )
+    for synapse_id, validate_column in target_synapse_ids:
+        print(f"Validating Synapse ID: {synapse_id} on column: {validate_column} against reference: {reference_synapse_id} on column: {reference_column}")
 
-    # Perform validation
-    results = validator.validate()
-    print("Validation Results:", results)
+        # Initialize SynapseValidator
+        validator = SynapseEntityCrossFileValidator(
+            synapse_id=synapse_id,
+            column=validate_column,
+            reference_synapse_id=reference_synapse_id,
+            reference_column=reference_column,
+            syn=syn
+        )
+        # Perform validation
+        results = validator.validate()
+        print("Validation Results:", results)
     validation_results_df = parse_json_logs_to_dataframe("validation_results.json")
     validation_results_df.to_csv("validation_results.csv", index=False)
 
