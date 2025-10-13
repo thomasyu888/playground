@@ -1,0 +1,17 @@
+Component,contributor,dataset_id,dataset_name,dataset_type,upload_date,num_items,dataset_size,scheduled_release_date,release_date,status,released_destinations,released,metadata_check,governance_compliance
+DataFlow,HTAN A,syn120,biospecimen,Biospecimen,2023-10-20,30,5,2024-03-20,Not applicable,scheduled for release,data portal,FALSE,FALSE,FALSE
+DataFlow,HTAN A,syn123,patient,Patient,2023-10-20,10,1,2024-03-20,Not applicable,scheduled for release,data portal,FALSE,FALSE,FALSE
+DataFlow,HTAN A,syn125,demo_data,Demographic,2023-10-15,10,1,2024-03-20,Not applicable,scheduled for release,data portal,FALSE,FALSE,FALSE
+DataFlow,HTAN A,syn128,biospecimen_2,Biospecimen,2023-10-15,10,1,2024-03-20,Not applicable,scheduled for release,data portal,FALSE,FALSE,FALSE
+DataFlow,HTAN A,syn122,other_assay,Other Assay,2023-10-15,20,1.5,2024-03-20,Not applicable,scheduled for release,data portal,FALSE,FALSE,FALSE
+DataFlow,HTAN B,syn234,patient,Not applicable,Not applicable,5,2,Not applicable,Not applicable,Not uploaded,Not applicable,FALSE,FALSE,FALSE
+DataFlow,HTAN B,syn203,biospecimen,Not applicable,Not applicable,5,2,Not applicable,Not applicable,Not uploaded,Not applicable,FALSE,FALSE,FALSE
+DataFlow,HTAN B,syn222,other_assay,Not applicable,Not applicable,15,4,Not applicable,Not applicable,Not uploaded,Not applicable,FALSE,FALSE,FALSE
+DataFlow,HTAN C,syn300,biospecimen,Biospecimen,2022-08-29,50,10,2022-09-01,Not applicable,ready for release,dbGaP,FALSE,TRUE,TRUE
+DataFlow,HTAN C,syn302,patient,Patient,2022-08-15,25,5,2022-09-01,Not applicable,ready for release,dbGaP,FALSE,TRUE,TRUE
+DataFlow,HTAN C,syn345,demo_data,Demographic,2022-08-15,25,5,2022-09-01,Not applicable,ready for release,dbGaP,FALSE,TRUE,TRUE
+DataFlow,HTAN C,syn340,biospecimen_2,Biospecimen,2022-08-15,3,1,2022-09-01,Not applicable,preprocessing,dbGaP,FALSE,FALSE,TRUE
+DataFlow,HTAN C,syn355,other_assay,Other Assay,2022-08-15,75,15,2022-09-01,Not applicable,preprocessing,dbGaP,FALSE,FALSE,TRUE
+DataFlow,HTAN C,syn321,patient,Patient,2022-08-15,5,2,2022-09-01,Not applicable,preprocessing,dbGaP,FALSE,TRUE,FALSE
+DataFlow,HTAN C,syn340,other_assay,Other Assay_2,2022-08-15,5,2,2022-09-01,Not applicable,quarantine,dbGaP,FALSE,FALSE,FALSE
+DataFlow,HTAN C,syn355,other_assay,Other Assay_3,Not applicable,5,2,2022-09-01,Not applicable,Not uploaded,dbGaP,FALSE,FALSE,FALSE
