@@ -1,0 +1,9 @@
+name,entityId,example_annotation,example_2_annotation
+biospecimen_non_human_M005_Longevity Consortium_09-11-2024_submit.csv,syn64097736,foo,3
+biospecimen-record-example-model-fail.csv,syn64097737,bar,7
+biospecimen-record-example-model-pass.csv,syn64097738,baz,5
+Biospecimen.xlsx,syn64097739,ddd,5
+bulkrna-seq-file-example-model-pass.csv,syn64097740,fossso,4
+bulkrnaseq-file-based-invalid (1).csv,syn64097741,eeee,3
+bulkrnaseq-file-based-invalid.csv,syn64097742,fff,2
+bulkrnaseq-file-example-model-fail.csv,syn64097743,fffff,1
